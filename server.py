@@ -13,7 +13,6 @@ app = Sanic("product_scanner")
 
 @app.post('/get_ingredients')
 async def test(request):
-    return json("dfgdfgdfg")
     ingredients_to_query = request.json
 
     all_ingredient_responses = []
