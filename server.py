@@ -6,7 +6,7 @@ from logic import search_ingredient_in_wikipedia, create_ingredients_list_respon
 app = Sanic("product_scanner")
 
 
-@app.post('/get_ingredients')
+@app.get('/get_ingredients')
 async def test(request):
     return json("dfgdfgdfg")
     ingredients_to_query = request.json
