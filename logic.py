@@ -22,6 +22,7 @@ def search_ingredient_in_wikipedia(ingredient: str) -> IngredientResponse:
     soup = BeautifulSoup(response.content, 'html.parser')
 
     text = soup.find(class_="mw-parser-output")
+    print(text)
 
     ingredient_description = (text.find('p').get_text())
 
@@ -51,7 +52,7 @@ def search_ingredient_not_found(ingredient: str) -> list:
 
     soup = BeautifulSoup(response.content, 'html.parser')
     root_class = soup.findAll(class_="mw-search-result-heading")
-    length = 4 if len(root_class) else len(root_class)
+    length = 4 if len(root_class) > 4 else len(root_class)
     ing_option_list = []
 
     for i in range(length):
