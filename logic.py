@@ -22,7 +22,9 @@ def search_ingredient_in_wikipedia(ingredient: str) -> IngredientResponse:
     soup = BeautifulSoup(response.content, 'html.parser')
 
     text = soup.find(class_="mw-parser-output")
-    print(text)
+
+    if text.find('p') is None:
+        return None
 
     ingredient_description = (text.find('p').get_text())
 
@@ -41,7 +43,6 @@ def create_ingredients_list_response(ingredient_responses: List[IngredientRespon
     response = {}
     for ingredient_response in ingredient_responses:
         response[ingredient_response.ingredient] = ingredient_response.to_dict()
-
     return response
 
 

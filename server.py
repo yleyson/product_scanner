@@ -4,27 +4,33 @@ from sanic import Sanic
 from sanic.response import json
 
 from logic import search_ingredient_in_wikipedia, create_ingredients_list_response, search_ingredient_not_found
+import concurrent.futures
 
 PORT = os.environ.get('PORT', 8000)
 HOST = "0.0.0.0"
 
 app = Sanic("product_scanner")
 
+all_ingredient_responses = []
 
+ingredients_to_query={}
 @app.post('/get_ingredients')
 async def test(request):
     ingredients_to_query = request.json
 
-    all_ingredient_responses = []
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        executor.map(ingredient_to_dict,ingredients_to_query)
+    return json(create_ingredients_list_response(all_ingredient_responses))
 
-    for ingredient in ingredients_to_query:
+
+def ingredient_to_dict(ingredient):
         ingredient_repose = search_ingredient_in_wikipedia(ingredient)
+        if ingredient_repose is None:
+            return
         if not ingredient_repose.found:
             ingredient_repose.maybe = search_ingredient_not_found(ingredient_repose.ingredient)
         print(ingredient_repose)
         all_ingredient_responses.append(ingredient_repose)
-
-    return json(create_ingredients_list_response(all_ingredient_responses))
 
 
 if __name__ == '__main__':
