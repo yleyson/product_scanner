@@ -42,6 +42,7 @@ def search_ingredient_in_wikipedia(ingredient: str) -> IngredientResponse:
 def create_ingredients_list_response(ingredient_responses: List[IngredientResponse]) -> dict:
     response = {}
     for ingredient_response in ingredient_responses:
+        print(ingredient_response.ingredient)
         response[ingredient_response.ingredient] = ingredient_response.to_dict()
     return response
 
