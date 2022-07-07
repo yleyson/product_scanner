@@ -21,6 +21,7 @@ async def test(request):
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.map(ingredient_to_dict,ingredients_to_query)
+    print(all_ingredient_responses)
     return json(create_ingredients_list_response(all_ingredient_responses))
 
 
