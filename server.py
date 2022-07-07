@@ -17,6 +17,7 @@ ingredients_to_query={}
 @app.post('/get_ingredients')
 async def test(request):
     ingredients_to_query = request.json
+    print(ingredients_to_query)
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.map(ingredient_to_dict,ingredients_to_query)
