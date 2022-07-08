@@ -29,7 +29,6 @@ async def test(request):
     all_ingredient_responses = [
         loop.run_in_executor(executor, ingredient_to_dict2, ingredient)
         for ingredient in ingredients_to_query
-        if ingredient is not None
     ]
     completed, pending = await asyncio.wait(all_ingredient_responses)
     results = [t.result() for t in completed]
