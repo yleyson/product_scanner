@@ -3,9 +3,9 @@ import requests
 from typing import List
 from bs4 import BeautifulSoup
 import threading
+
 lock = threading.Lock()
 from models import IngredientResponse
-response_dict = {}
 
 
 WIKIPEDIA_SEARCH_TEMPLATE = "https://he.wikipedia.org/wiki/{ingredient}"
@@ -35,6 +35,8 @@ def search_ingredient_in_wikipedia(ingredient: str) -> IngredientResponse:
 
     found = ingredient_description != "" and ingredient_description.strip() != "האם התכוונתם ל..."
 
+    print(ingredient)
+
     return IngredientResponse(
         ingredient=ingredient,
         found=found,
@@ -43,15 +45,12 @@ def search_ingredient_in_wikipedia(ingredient: str) -> IngredientResponse:
 
 
 def create_ingredients_list_response(ingredient_responses: List[IngredientResponse]) -> dict:
-
+    response_dict = {}
     for ingredient_response in ingredient_responses:
-        lock.acquire()
-        try:
-            response_dict[ingredient_response.ingredient] = ingredient_response.to_dict()
-        finally:
-            # Always called, even if exception is raised in try block
-            lock.release()
-        print(ingredient_response.ingredient)
+        if ingredient_response is not None:
+         response_dict[ingredient_response.ingredient] = ingredient_response.to_dict()
+
+    print(ingredient_response.ingredient)
     return response_dict
 
 

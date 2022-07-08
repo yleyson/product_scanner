@@ -1,43 +1,73 @@
 import os
+import asyncio
 
 from sanic import Sanic
 from sanic.response import json
 
 from logic import search_ingredient_in_wikipedia, create_ingredients_list_response, search_ingredient_not_found
 import concurrent.futures
-from concurrent.futures import wait
 import threading
 
-lock = threading.Lock()
 PORT = os.environ.get('PORT', 8000)
 HOST = "0.0.0.0"
 
 app = Sanic("product_scanner")
-
 all_ingredient_responses = []
 
-ingredients_to_query={}
+ingredients_to_query = {}
+
+
 @app.post('/get_ingredients')
 async def test(request):
     ingredients_to_query = request.json
-    print(ingredients_to_query)
 
-    with concurrent.futures.ThreadPoolExecutor() as executor:
-        executor.map(ingredient_to_dict,ingredients_to_query)
-        print('Waiting...')
-    print(all_ingredient_responses)
-    return json(create_ingredients_list_response(all_ingredient_responses))
+    loop = asyncio.get_event_loop()
+    executor = concurrent.futures.ThreadPoolExecutor(
+        len(ingredients_to_query),
+    )
+
+    all_ingredient_responses = [
+        loop.run_in_executor(executor, ingredient_to_dict2, ingredient)
+        for ingredient in ingredients_to_query
+        if ingredient is not None
+    ]
+    completed, pending = await asyncio.wait(all_ingredient_responses)
+    results = [t.result() for t in completed]
+    print("dfdsfdfdsfsdfdsf"  + str(len(all_ingredient_responses)))
+
+    # with concurrent.futures.ThreadPoolExecutor() as executor:
+    #    executor.map(ingredient_to_dict,ingredients_to_query)
+    return json(create_ingredients_list_response(results))
 
 
-def ingredient_to_dict(ingredient):
+def ingredient_to_dict(ingredients_to_query):
+    for ingredient in ingredients_to_query:
         ingredient_repose = search_ingredient_in_wikipedia(ingredient)
         if ingredient_repose is None:
-            return
+            return None
         if not ingredient_repose.found:
             ingredient_repose.maybe = search_ingredient_not_found(ingredient_repose.ingredient)
-        print(ingredient_repose)
         all_ingredient_responses.append(ingredient_repose)
 
 
+def ingredient_to_dict2(ingredient):
+    print(ingredient)
+    ingredient_repose = search_ingredient_in_wikipedia(ingredient)
+    if ingredient_repose is None:
+        return None
+    if not ingredient_repose.found:
+        ingredient_repose.maybe = search_ingredient_not_found(ingredient_repose.ingredient)
+    print(ingredient_repose.description)
+    return ingredient_repose
+
+
 if __name__ == '__main__':
-    app.run(port=PORT, host=HOST)
+
+    event_loop = asyncio.get_event_loop()
+    try:
+        event_loop.run_until_complete(app.run(port=PORT, host=HOST))
+
+    finally:
+        event_loop.close()
+
+
