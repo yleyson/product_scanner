@@ -5,7 +5,10 @@ from sanic.response import json
 
 from logic import search_ingredient_in_wikipedia, create_ingredients_list_response, search_ingredient_not_found
 import concurrent.futures
+from concurrent.futures import wait
+import threading
 
+lock = threading.Lock()
 PORT = os.environ.get('PORT', 8000)
 HOST = "0.0.0.0"
 
@@ -21,6 +24,7 @@ async def test(request):
 
     with concurrent.futures.ThreadPoolExecutor() as executor:
         executor.map(ingredient_to_dict,ingredients_to_query)
+        print('Waiting...')
     print(all_ingredient_responses)
     return json(create_ingredients_list_response(all_ingredient_responses))
 
