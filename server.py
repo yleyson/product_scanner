@@ -1,5 +1,6 @@
 import os
 import asyncio
+import re
 
 from sanic import Sanic
 from sanic.response import json
@@ -30,12 +31,13 @@ async def test(request):
         loop.run_in_executor(executor, ingredient_to_dict2, ingredient)
         for ingredient in ingredients_to_query
     ]
-    completed, pending = await asyncio.wait(all_ingredient_responses)
-    results = [t.result() for t in completed]
-    print("dfdsfdfdsfsdfdsf"  + str(len(all_ingredient_responses)))
 
-    # with concurrent.futures.ThreadPoolExecutor() as executor:
-    #    executor.map(ingredient_to_dict,ingredients_to_query)
+
+
+    completed,pending = await asyncio.wait(all_ingredient_responses)
+    results = [t.result() for t in completed]
+    print("array length" + str(len(all_ingredient_responses)))
+
     return json(create_ingredients_list_response(results))
 
 
@@ -57,16 +59,14 @@ def ingredient_to_dict2(ingredient):
     if not ingredient_repose.found:
         ingredient_repose.maybe = search_ingredient_not_found(ingredient_repose.ingredient)
     print(ingredient_repose.description)
+    ingredient_repose.ingredient=re.sub("[/\W]+", '', ingredient_repose.ingredient)
     return ingredient_repose
 
 
 if __name__ == '__main__':
-
+    print('enter')
     event_loop = asyncio.get_event_loop()
     try:
         event_loop.run_until_complete(app.run(port=PORT, host=HOST))
-
     finally:
         event_loop.close()
-
-
