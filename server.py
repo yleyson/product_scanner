@@ -54,12 +54,14 @@ def ingredient_to_dict(ingredients_to_query):
 def ingredient_to_dict2(ingredient):
     print(ingredient)
     ingredient_repose = search_ingredient_in_wikipedia(ingredient)
+    whitelist = set('abcdefghijklmnopqrstuvwxyz ABCDEFGHIJKLMNOPQRSTUVWXYZ אבגדהוזחטיכלמנסעפצקרשתךףןץ')
+
     if ingredient_repose is None:
         return None
     if not ingredient_repose.found:
         ingredient_repose.maybe = search_ingredient_not_found(ingredient_repose.ingredient)
     print(ingredient_repose.description)
-    ingredient_repose.ingredient=re.sub("[/\W]+", '', ingredient_repose.ingredient)
+    ingredient_repose.ingredient=''.join(filter(whitelist.__contains__, ingredient_repose.ingredient))
     return ingredient_repose
 
 
