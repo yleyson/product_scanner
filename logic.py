@@ -27,6 +27,7 @@ def search_ingredient_in_wikipedia(ingredient: str) -> IngredientResponse:
     text = soup.find(class_="mw-parser-output")
 
     if text.find('p') is None:
+        print('None')
         return None
 
     ingredient_description = (text.find('p').get_text())
@@ -49,8 +50,6 @@ def create_ingredients_list_response(ingredient_responses: List[IngredientRespon
     for ingredient_response in ingredient_responses:
         if ingredient_response is not None:
          response_dict[ingredient_response.ingredient] = ingredient_response.to_dict()
-
-    print(ingredient_response.ingredient)
     return response_dict
 
 
