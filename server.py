@@ -19,7 +19,9 @@ ingredients_to_query = {}
 @app.post('/get_ingredients')
 async def test(request):
     """
-post function for web scrapping api
+post function for web scrapping api , using threading to achieve faster web scrapping,
+ get list of ingredient and return the json of IngredientResponse objects which contained description if found
+ for each  ingredient
     :param request:list[str]
     :return:dict[IngredientResponse]
     """
@@ -32,7 +34,7 @@ post function for web scrapping api
         len(ingredients_to_query),
     )
 
-    # list comprehension who create the ingredients array
+    # list comprehension which create the ingredients array
     all_ingredient_responses = [
         loop.run_in_executor(executor, ingredient_to_dict, ingredient)
         # execute concurrency ingredient_to_dict function
@@ -48,7 +50,7 @@ post function for web scrapping api
 
 def ingredient_to_dict(ingredient):
     """
-function that return IngredientResponse object who contain the ingredient data
+function that return IngredientResponse object which contain the ingredient data
     :param ingredient: str
     :return:ingredient_repose: IngredientResponse
     """

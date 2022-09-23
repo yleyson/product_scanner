@@ -30,7 +30,7 @@ web scrapping function
         )
     # get the html of the page
     soup = BeautifulSoup(response.content, 'html.parser')
-    # get the class who containd the first paragraph
+    # get the class which contained the first paragraph
     text = soup.find(class_="mw-parser-output")
 
     if text.find('p') is None:
@@ -69,7 +69,9 @@ function that return dictionary with all the ingredient objects
 
 def search_ingredient_not_found(ingredient: str) -> list:
     """
-function for ingredient that doesnt have any description
+function for ingredient that doesnt have any description,
+loop throw html root_class in the WIKIPEDIA search page,
+to get the ingredient options to select text , maximum of 4 options to select
     :param ingredient: str
     :return: list : str
     """
@@ -80,10 +82,8 @@ function for ingredient that doesnt have any description
 
     soup = BeautifulSoup(response.content, 'html.parser')
     root_class = soup.findAll(class_="mw-search-result-heading")
-    # get maximum of 4 options to select
     length = 4 if len(root_class) > 4 else len(root_class)
     ing_option_list = []
-    # loop throw root_class to get the ingredient options to select text
     for i in range(length):
         ing_option_list.append(root_class[i].find('a').get_text())
     return ing_option_list
